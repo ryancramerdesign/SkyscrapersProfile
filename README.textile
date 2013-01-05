@@ -35,6 +35,10 @@ $config->appendTemplateFile = '_out.php';
 
 Use of this new feature is optional. We've used it in this profile because it reduces the amount of redundant include() code necessary in each of our template files. 
 
+h2. Screenshot
+
+!http://modules.processwire.com/site/assets/files/1215/skyscrapers-screenshot.jpg(screenshot)!
+
 ---------------
 Copyright 2013 by Ryan Cramer Design, LLC
 
