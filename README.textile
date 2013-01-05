@@ -12,8 +12,7 @@ h2. Requirements
 h2. How to install
 
 # Get the latest version of ProcessWire 2.3. At the time this text was written, ProcessWire 2.3 wasn't yet released, so if that is still the case you'll want to get version "2.2.12 or newer":https://github.com/ryancramerdesign/ProcessWire/tree/dev from the dev branch. 
-# Before running the installer, replace all the files/directories in the /site-default/ directory of ProcessWire with those from this site profile. 
-This includes the following:
+# Before running the installer, replace all the files/directories in the /site-default/ directory of ProcessWire with those from this site profile. This includes the following:
 ** /site-default/config.php
 ** /site-default/install/
 ** /site-default/modules/
