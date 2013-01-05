@@ -23,10 +23,10 @@ h2. Template details
 
 The template files in the profile take the approach of populating variables that are output within a main/shared markup file. This is different from the basic profile that ProcessWire comes with. Specifically, make note of the following files:
 
-* /site/templates/_init.php - This file is automatically included before any template file is executed. We use it to initialize the variables we populate and include a shared library of functions.
-* /site/templates/_out.php - This file is automatically included after any template file is executed. In our case, we use it to contain our main markup that also outputs the variables we populated.
-* /site/templates/includes/functions.php - This is where we are keeping a shared library of functions, most for generating skyscraper list markup.
-* /site/templates/*.php - These are the site's template files, each named consistently with the page(s) they represent. The primary focus of these files is to populate the $content variable that is output by _out.php.
+* "/site/templates/_init.php":https://github.com/ryancramerdesign/SkyscrapersProfile/blob/master/site/templates/_init.php - This file is automatically included before any template file is executed. We use it to initialize the variables we populate and include a shared library of functions.
+* "/site/templates/_out.php":https://github.com/ryancramerdesign/SkyscrapersProfile/blob/master/site/templates/_out.php - This file is automatically included after any template file is executed. In our case, we use it to contain our main markup that also outputs the variables we populated.
+* "/site/templates/includes/functions.php":https://github.com/ryancramerdesign/SkyscrapersProfile/blob/master/site/templates/includes/functions.php - This is where we are keeping a shared library of functions, most for generating skyscraper list markup.
+* "/site/templates/*.php":https://github.com/ryancramerdesign/SkyscrapersProfile/tree/master/site/templates - These are the site's template files, each named consistently with the page(s) they represent. The primary focus of these files is to populate the $content variable that is output by _out.php.
 
 The use of _init.php and _out.php are something new to ProcessWire 2.3. These are specified in the /site/config.php:
 
