@@ -82,8 +82,6 @@
 
 			<?php 
 
-			if($page->body_embed) echo $page->body_embed; 
-
 			echo $content; 
 
 			include("./includes/search_form.php"); 

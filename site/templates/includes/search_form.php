@@ -5,7 +5,8 @@
 
 	<p>
 	<label for='search_keywords'>Keywords</label>
-	<input type='text' name='keywords' id='search_keywords' value='<?php if($input->whitelist->keywords) echo $sanitizer->entities($input->whitelist->keywords); ?>' />
+	<input type='text' name='keywords' id='search_keywords' value='<?php 
+		if($input->whitelist->keywords) echo $sanitizer->entities($input->whitelist->keywords); ?>' />
 	</p>
 
 	<p>
