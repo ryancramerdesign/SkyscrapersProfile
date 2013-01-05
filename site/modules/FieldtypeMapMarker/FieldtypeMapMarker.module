@@ -1,0 +1,162 @@
+<?php
+
+/**
+ * ProcessWire Map Marker Fieldtype
+ *
+ * Holds an address and geocodes it to latitude and longitude via Google Maps
+ * 
+ * For documentation about the fields used in this class, please see:  
+ * /wire/core/Fieldtype.php
+ * 
+ * ProcessWire 2.x 
+ * Copyright (C) 2011 by Ryan Cramer 
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ * 
+ * http://www.processwire.com
+ * http://www.ryancramer.com
+ *
+ */
+
+class FieldtypeMapMarker extends Fieldtype {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => 'Map Marker',
+			'version' => 101,
+			'summary' => 'Field that stores an address with latitude and longitude coordinates and has built-in geocoding capability with Google Maps API.',
+			'installs' => 'InputfieldMapMarker',
+			);
+	}
+
+	/**
+	 * Include our MapMarker class, which serves as the value for fields of type FieldtypeMapMarker
+	 *
+	 */
+	public function __construct() {	
+		require_once(dirname(__FILE__) . '/MapMarker.php'); 
+	}
+
+	/**
+	 * Return the Inputfield required by this Fieldtype
+	 *
+	 */
+	public function getInputfield(Page $page, Field $field) {
+		$inputfield = $this->modules->get('InputfieldMapMarker'); 
+		return $inputfield; 
+	}
+
+	/**
+	 * Return all compatible Fieldtypes 
+	 *
+	 */
+	public function ___getCompatibleFieldtypes(Field $field) {
+		// there are no other fieldtypes compatible with this one
+		return null;
+	}
+
+	/**
+	 * Sanitize value for runtime
+	 *
+	 */
+	public function sanitizeValue(Page $page, Field $field, $value) {
+
+		// if it's not a MapMarker, then just return a blank MapMarker
+		if(!$value instanceof MapMarker) $value = $this->getBlankValue($page, $field); 
+
+		// if the address changed, tell the $page that this field changed
+		if($value->isChanged('address')) $page->trackChange($field->name); 
+
+		return $value; 
+	}
+
+	/**
+	 * Get a blank value used by this fieldtype
+	 *
+	 */
+	public function getBlankValue(Page $page, Field $field) {
+		return new MapMarker(); 
+	}
+
+	/**
+	 * Given a raw value (value as stored in DB), return the value as it would appear in a Page object
+	 *
+	 * @param Page $page
+	 * @param Field $field
+	 * @param string|int|array $value
+	 * @return string|int|array|object $value
+	 *
+	 */
+	public function ___wakeupValue(Page $page, Field $field, $value) {
+
+		// get a blank MapMarker instance
+		$marker = $this->getBlankValue($page, $field); 
+
+		// populate the marker
+		$marker->address = $value['data'];
+		$marker->lat = $value['lat'];
+		$marker->lng = $value['lng'];
+		$marker->status = $value['status'];
+		$marker->setTrackChanges(true); 
+
+		return $marker; 
+	}
+
+	/**
+	 * Given an 'awake' value, as set by wakeupValue, convert the value back to a basic type for storage in DB. 
+	 *              
+	 * @param Page $page
+	 * @param Field $field
+	 * @param string|int|array|object $value
+	 * @return string|int
+	 *
+	 */
+	public function ___sleepValue(Page $page, Field $field, $value) {
+
+		$marker = $value;
+
+		if(!$marker instanceof MapMarker) 
+			throw new WireException("Expecting an instance of MapMarker");
+
+		// if the address was changed, then force it to geocode the new address
+		if($marker->isChanged('address') && $marker->address && $marker->status != MapMarker::statusNoGeocode) $marker->geocode();
+
+		$sleepValue = array(
+			'data' => $marker->address, 
+			'lat' => $marker->lat, 
+			'lng' => $marker->lng, 
+			'status' => $marker->status,
+			);
+
+		return $sleepValue; 
+	}
+
+
+	/**
+	 * Return the database schema in specified format
+	 *
+	 */
+	public function getDatabaseSchema(Field $field) {
+
+		// get the default schema
+		$schema = parent::getDatabaseSchema($field); 
+
+		$schema['data'] = "VARCHAR(255) NOT NULL DEFAULT ''"; 	// address (reusing the 'data' field from default schema)
+		$schema['lat'] = "FLOAT(10,6) NOT NULL DEFAULT 0";	// latitude
+		$schema['lng'] = "FLOAT(10,6) NOT NULL DEFAULT 0";	// longitude
+		$schema['status'] = "TINYINT NOT NULL DEFAULT 0";	// geocode status
+		$schema['keys']['latlng'] = "KEY latlng (lat, lng)";	// keep an index of lat/lng 
+
+		return $schema;
+	}
+
+	/**
+	 * Perform installation: check that this fieldtype can be used with geocoding and warn them if not. 
+	 *
+	 */
+	public function ___install() {
+		if(!ini_get('allow_url_fopen')) {
+			$this->error("MapMarker Geocoding will not work because 'allow_url_fopen' is denied in your PHP settings."); 
+		}
+	}
+}
+

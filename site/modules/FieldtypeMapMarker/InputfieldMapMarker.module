@@ -1,0 +1,152 @@
+<?php
+
+/**
+ * ProcessWire Map Marker Inputfield
+ *
+ * Provides the admin control panel inputs for FieldtypeMapMarker
+ * 
+ * For documentation about the fields used in this class, please see:  
+ * /wire/core/Fieldtype.php
+ * 
+ * ProcessWire 2.x 
+ * Copyright (C) 2011 by Ryan Cramer 
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ * 
+ * http://www.processwire.com
+ * http://www.ryancramer.com
+ *
+ */
+
+class InputfieldMapMarker extends Inputfield {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => 'Map Marker',
+			'version' => 101,
+			'summary' => "Provides input for the MapMarker Fieldtype",
+			'requires' => 'FieldtypeMapMarker',
+			);
+	}
+
+	/**
+	 * Just in case this Inputfield is being used separately from FieldtypeMapmarker, we include the MapMarker class
+	 *
+	 */
+	public function __construct() {
+		require_once(dirname(__FILE__) . '/MapMarker.php'); 
+		parent::__construct();
+	}
+
+	/**
+	 * Initialize the MapMarker Inputfield
+	 *
+	 * We require Google Maps API for map display, so we add it the scripts that will be loaded in PW admin
+	 *
+	 */
+	public function init() {
+		$this->config->scripts->add(($this->config->https ? 'https' : 'http') . '://maps.google.com/maps/api/js?sensor=false'); 
+		return parent::init();
+	}
+
+	/**
+	 * Set an attribute to this Inputfield
+	 *
+	 * In this case, we just capture the 'value' attribute and make sure it's something valid
+ 	 *
+	 */
+	public function setAttribute($key, $value) {
+
+		if($key == 'value' && !$value instanceof MapMarker && !is_null($value)) {
+			throw new WireException("This input only accepts a MapMarker for it's value"); 
+		}
+
+		return parent::setAttribute($key, $value); 
+	}
+
+	/**
+	 * Render the markup needed to draw the Inputfield
+	 *
+	 */
+	public function ___render() {
+
+		$name = $this->attr('name'); 
+		$id = $this->attr('id'); 
+		$marker = $this->attr('value'); 
+		$address = htmlentities($marker->address, ENT_QUOTES, "UTF-8"); 
+		$apiNote = '$page->' . $name . '->';
+		$toggleChecked = $marker->status != MapMarker::statusNoGeocode ? " checked='checked'" : '';
+		$status = $marker->status == MapMarker::statusNoGeocode ? 0 : $marker->status; 
+
+		$out = <<< _OUT
+
+		<p class='InputfieldMapMarkerAddress'>
+			<label>
+				Address 
+				<br />
+				<input type='text' id='{$id}' name='{$name}' value='{$address}'  /><br />
+				<span class='detail'>{$apiNote}address</span>
+			</label>
+		</p>
+		<p class='InputfieldMapMarkerToggle'>
+			<label>
+				<br />
+				<input title='Geocode ON/OFF' type='checkbox' name='_{$name}_status' id='_{$name}_toggle' value='$status'$toggleChecked />
+			</label>
+		</p>
+
+		<p class='InputfieldMapMarkerLat'>
+			<label>
+				Latitude<br />
+				<input type='text' id='_{$id}_lat' name='_{$name}_lat' value='{$marker->lat}' />
+				<span class='detail'>{$apiNote}lat</span>
+			</label>
+		</p>
+
+		<p class='InputfieldMapMarkerLng'>
+			<label>
+				Longitude<br />
+				<input type='text' id='_{$id}_lng' name='_{$name}_lng' value='{$marker->lng}' />
+				<span class='detail'>{$apiNote}lng</span>
+			</label>
+		</p>
+
+
+_OUT;
+
+		$out .= "<div class='InputfieldMapMarkerMap' id='_{$id}_map' data-lat='{$marker->lat}' data-lng='{$marker->lng}'></div>";
+		if(!$this->description) $this->description = "Enter a location in the Address field below and it will be geocoded to latitude/longitude when you save.";
+		$this->notes = $marker->statusString; 
+
+		return $out; 
+	}
+
+	/**
+	 * Process the input after a form submission
+	 *
+	 */
+	public function ___processInput(WireInputData $input) {
+
+		$name = $this->attr('name'); 
+		$marker = $this->attr('value');
+
+		if(isset($input->$name)) {
+
+			$marker->set('address', $input->$name);
+			$marker->set('lat', $input["_{$name}_lat"]); 
+			$marker->set('lng', $input["_{$name}_lng"]); 
+		
+				
+			$status = $input["_{$name}_status"]; 
+			if(is_null($status)) $marker->set('status', MapMarker::statusNoGeocode); // disable geocode
+				else $marker->set('status', (int) $status);
+
+			// if the address changed, then redo the geocoding.
+			// while we do this in the Fieldtype, we also do it here in case this Inputfield is used on it's own.
+			// the MapMarker class checks to make sure it doesn't do the same geocode twice. 
+			if($marker->isChanged('address') && $marker->address && $marker->status != MapMarker::statusNoGeocode) $marker->geocode();
+		}
+
+		return $this;
+	}
+
+}

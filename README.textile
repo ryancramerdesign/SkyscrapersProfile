@@ -1,0 +1,64 @@
+h1. ProcessWire Skyscrapers Site Profile
+
+This is the profile for the skyscrapers demo site as seen at: 
+"http://processwire.com/skyscrapers/":http://processwire.com/skyscrapers/
+
+The main differences from the live site are that this profile excludes 
+most of the photos and skyscraper text. Only the photos taken by me, Ryan 
+Cramer are included. This is to ensure we aren't distributing any text or
+photos in case the license ever changes to something other than Wikimedia
+Commons. I can change the text/photos on my skyscrapers site, but can't 
+on any sites someone else sets up with this profile, so figure it's 
+better to play it safe. 
+
+h2. Requirements
+
+Requires ProcessWire 2.3 (2.2.12 dev branch or newer)
+
+h2. How to install
+
+# Get the latest version of ProcessWire 2.3. At the time this text was 
+written, ProcessWire 2.3 wasn't yet released, so if that is still the case
+you'll want to get version "2.2.12 or newer":https://github.com/ryancramerdesign/ProcessWire/tree/dev 
+from the dev branch. 
+# Before running the installer, replace all the files/directories in the
+/site-default/ directory of ProcessWire with those from this site profile. 
+This includes the following:
+** /site-default/config.php
+** /site-default/install/
+** /site-default/modules/
+** /site-default/templates/
+# Now run the installer to complete the installation.
+
+h2. Template details
+
+The template files in the profile take the approach of populating variables
+that are output within a main/shared markup file. This is different from
+the basic profile that ProcessWire comes with. Specifically, make note
+of the following files:
+
+* /site/templates/_init.php - This file is automatically included before any
+template file is executed. We use it to initialize the variables we populate
+and include a shared library of functions.
+* /site/templates/_out.php - This file is automatically included after any
+template file is executed. In our case, we use it to contain our main markup
+that also outputs the variables we populated.
+* /site/templates/includes/functions.php - This is where we are keeping a
+shared library of functions, most for generating skyscraper list markup.
+* /site/templates/*.php - These are the site's template files, each named
+consistently with the page(s) they represent. The primary focus of these
+files is to populate the $content variable that is output by _out.php.
+
+The use of _init.php and _out.php are something new to ProcessWire 2.3. These
+are specified in the /site/config.php:
+
+bc. $config->prependTemplateFile = '_init.php';
+$config->appendTemplateFile = '_out.php';
+
+Use of this new feature is optional. We've used it in this profile because it
+reduces the amount of redundant include() code necessary in each of our 
+template files. 
+
+---------------
+Copyright 2013 by Ryan Cramer Design, LLC
+
