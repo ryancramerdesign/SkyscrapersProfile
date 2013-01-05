@@ -6,7 +6,8 @@ The main differences from the live site are that this profile excludes most of t
 
 h2. Requirements
 
-Requires ProcessWire 2.3 (2.2.12 dev branch or newer)
+* ProcessWire 2.3
+* OR ProcessWire 2.2 "dev branch":https://github.com/ryancramerdesign/ProcessWire/tree/dev (2.2.12 or newer)
 
 h2. How to install
 
