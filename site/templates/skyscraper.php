@@ -14,6 +14,9 @@
  *
  * Currently, this just finds skyscrapers that mention the given one in their bodycopy
  *
+ * Note that because the site-profile version of this site contains Latin text rather than 
+ * real text, this function won't ever find anything except on the live processwire.com/skyscrapers/ site.
+ *
  * @return PageArray
  *
  */
@@ -69,6 +72,9 @@ function renderSkyscraperBody($page) {
 	$out .= "\n<h3>See Also</h3>" . 
 		"\n<ul class='page_list'>"; 
 
+	// find potentially related skyscrapers by performing a text search.
+	// this only works on processwire.com/skyscrapers/, since the site profile
+	// has had all the real text replaced with latin placeholder text
 	foreach(findRelatedSkyscrapers($page) as $item) {
 		$out .= "\n\t<li><a href='{$item->url}'>{$item->title}, {$item->parent->title}</a></li>";
 	}
@@ -117,7 +123,7 @@ function renderSkyscraperData($page) {
 	return $out; 
 }
 
-/**
+/*************************************************************************************************
  * Compile the data into the final output 
  *
  */

@@ -3,7 +3,7 @@
 /***************************************************************************************
  * SHARED SKYSCRAPER FUNCTIONS
  *
- * The following functions find and render skyscrapers are are defined here so that
+ * The following functions find and render skyscrapers and are defined here so that
  * they can be used by multiple template files. 
  *
  */
@@ -138,11 +138,11 @@ function renderSkyscraperListHeader($showCity = true) {
 }
 
 /** 
- * Get a generated table/listing of skyscrapers found from the given selector.
+ * Render a table/list of the given $skyscrapers
  *
- * @param string $selector Selector to find skyscrapers
- * @param string $showPagination Set to false to disable pagination links (default is true)
- * @return string The content to be placed in the template
+ * @param PageArray $skyscrapers Skyscrapers to render
+ * @param bool $showHeader Should the <thead> with sort links be displayed? default=true
+ * @return string The rendered markup
  *
  */
 function renderSkyscraperList(PageArray $skyscrapers, $showHeader = true) {
@@ -222,7 +222,7 @@ function renderSkyscraperItem(Page $skyscraper, $showCity = true) {
 	} else $summary = '';
 
 	// what we show when a field is blank
-	$na = "<span class='na'>n/a</span>";
+	$na = "<span class='na'>N/A</span>";
 
 	// start a table row for the output markup
 	$out = 	"\n\t<tr class='skyscraper_details'>" . 
@@ -254,6 +254,9 @@ function renderSkyscraperItem(Page $skyscraper, $showCity = true) {
  * selector is the most readable fashion and removes any parts that aren't necessary
  *
  * This is not something you would bother with on a site that wasn't demonstrating a CMS. :) 
+ *
+ * @param string $selector
+ * @return string
  *
  */
 function makePrettySelector($selector) {
