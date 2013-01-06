@@ -41,7 +41,7 @@
 
 		<?php 
 
-		if($page->template == 'skyscraper' || $page->template == 'city') {
+		if($page->template == 'skyscraper') {
 			$markers = new PageArray();
 			$markers->add($page); 
 
